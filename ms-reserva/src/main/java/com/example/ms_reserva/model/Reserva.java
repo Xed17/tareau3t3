@@ -1,6 +1,7 @@
 package com.example.ms_reserva.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -12,7 +13,8 @@ import java.time.LocalTime;
 public class Reserva {
 
     @Id
-    @Column(name = "nro_reser", columnDefinition = "CHAR(8)")
+    @Column(name = "nro_reser", length = 8)
+    @JdbcTypeCode(java.sql.Types.CHAR)
     private String nroReser;
 
     @Column(name = "fecha_reser", nullable = false)

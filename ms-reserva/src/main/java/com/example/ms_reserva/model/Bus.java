@@ -1,6 +1,7 @@
 package com.example.ms_reserva.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
 @Table(name = "bus", indexes = {
@@ -9,13 +10,15 @@ import jakarta.persistence.*;
 public class Bus {
 
     @Id
-    @Column(name = "cod_bus", columnDefinition = "CHAR(5)")
+    @Column(name = "cod_bus", length = 5)
+    @JdbcTypeCode(java.sql.Types.CHAR)
     private String codBus;
 
     @Column(name = "mod_bus", length = 15)
     private String modBus;
 
-    @Column(name = "placa_bus", columnDefinition = "CHAR(8)")
+    @Column(name = "placa_bus", length = 8)
+    @JdbcTypeCode(java.sql.Types.CHAR)
     private String placaBus;
 
     @Column(name = "cap_bus")

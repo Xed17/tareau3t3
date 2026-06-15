@@ -1,6 +1,7 @@
 package com.example.ms_reserva.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import java.math.BigDecimal;
 
 @Entity
@@ -10,7 +11,8 @@ import java.math.BigDecimal;
 public class Destino {
 
     @Id
-    @Column(name = "cod_dest", columnDefinition = "CHAR(4)")
+    @Column(name = "cod_dest", length = 4)
+    @JdbcTypeCode(java.sql.Types.CHAR)
     private String codDest;
 
     @Column(name = "ciu_dest", length = 25)
