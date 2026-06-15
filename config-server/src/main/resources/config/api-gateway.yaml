@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: ms-reserva-routes
+          uri: lb://ms-reserva
+          predicates:
+            - Path=/reservas/**, /buses/**, /clientes/**, /destinos/**, /programaciones/**, /usuarios/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: "YourSuperSecretKeyForJWTGenerationThatIsLongEnoughToAvoidErrors123456!"
+  expiration: 86400 # 1 day in seconds

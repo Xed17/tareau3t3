@@ -1,0 +1,176 @@
+{
+	"info": {
+		"_postman_id": "988e0f7f-f988-4646-81e9-4bf832fdf597",
+		"name": "Microservicios Reservas y Seguridad",
+		"description": "Colección para probar el API Gateway con seguridad JWT y ms-reserva.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Iniciar Sesión (Obtener JWT Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.token) {",
+							"    pm.globals.set(\"jwt_token\", jsonData.token);",
+							"    console.log(\"Token JWT guardado en variable global 'jwt_token'\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"test\",\n    \"password\": \"testpassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "Petición para iniciar sesión a través del Gateway. El token generado se almacena automáticamente en la variable global 'jwt_token'."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Listar Reservas (Sin Autenticar - Debería dar 401)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/reservas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reservas"
+					]
+				},
+				"description": "Prueba de seguridad sin cabecera de autorización Bearer Token. Debería retornar código HTTP 401."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Listar Reservas (Autenticado con JWT)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/reservas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reservas"
+					]
+				},
+				"description": "Obtiene la lista de reservas a través del Gateway utilizando el JWT token almacenado."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Crear Reserva (Autenticado con JWT)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fechaReser\": \"2026-06-15\",\n    \"horaReser\": \"15:30:00\",\n    \"cliente\": {\n        \"codCli\": \"CLI01\"\n    },\n    \"programacion\": {\n        \"idProg\": 1\n    },\n    \"destino\": {\n        \"codDest\": \"D001\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/reservas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reservas"
+					]
+				},
+				"description": "Crea una nueva reserva validando relaciones. El campo nroReser se genera automáticamente (ej: R0000001)."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Obtener Reserva por ID (Autenticado con JWT)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/reservas/R0000001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reservas",
+						"R0000001"
+					]
+				},
+				"description": "Obtiene la información detallada de una reserva específica pasándole su código nro_reser."
+			},
+			"response": []
+		}
+	]
+}
