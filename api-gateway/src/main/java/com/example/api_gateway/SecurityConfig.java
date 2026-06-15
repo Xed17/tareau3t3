@@ -28,7 +28,8 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .pathMatchers("/auth/login").permitAll()
-                        .anyExchange().authenticated()
+                        .pathMatchers(HttpMethod.GET, "/reservas", "/reservas/**").hasAnyRole("USER", "ADMIN")
+                        .anyExchange().hasRole("ADMIN")
                 )
                 .addFilterAt(jwtWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();

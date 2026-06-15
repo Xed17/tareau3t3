@@ -37,4 +37,44 @@ public class ProgramacionController {
     public ResponseEntity<List<Programacion>> listarProgramaciones() {
         return ResponseEntity.ok(programacionRepository.findAll());
     }
+
+    @GetMapping("/{idProg}")
+    public ResponseEntity<?> obtenerProgramacion(@PathVariable Integer idProg) {
+        return programacionRepository.findById(idProg)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{idProg}")
+    public ResponseEntity<?> actualizarProgramacion(@PathVariable Integer idProg, @RequestBody Programacion programacionDetails) {
+        return programacionRepository.findById(idProg)
+                .<ResponseEntity<?>>map(existingProg -> {
+                    if (programacionDetails.getBus() != null && programacionDetails.getBus().getCodBus() != null) {
+                        Bus bus = busRepository.findById(programacionDetails.getBus().getCodBus().trim())
+                                .orElse(null);
+                        if (bus == null) {
+                            return ResponseEntity.badRequest().body("Bus no encontrado con código: " + programacionDetails.getBus().getCodBus());
+                        }
+                        existingProg.setBus(bus);
+                    }
+                    if (programacionDetails.getFecha() != null) {
+                        existingProg.setFecha(programacionDetails.getFecha());
+                    }
+                    if (programacionDetails.getHora() != null) {
+                        existingProg.setHora(programacionDetails.getHora());
+                    }
+                    return ResponseEntity.ok(programacionRepository.save(existingProg));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{idProg}")
+    public ResponseEntity<?> eliminarProgramacion(@PathVariable Integer idProg) {
+        return programacionRepository.findById(idProg)
+                .<ResponseEntity<?>>map(existingProg -> {
+                    programacionRepository.delete(existingProg);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

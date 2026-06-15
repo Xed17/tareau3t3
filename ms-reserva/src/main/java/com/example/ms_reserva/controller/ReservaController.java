@@ -46,4 +46,27 @@ public class ReservaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener reserva: " + e.getMessage());
         }
     }
+    @PutMapping("/{nroReser}")
+    public ResponseEntity<?> actualizarReserva(@PathVariable String nroReser, @RequestBody Reserva reserva) {
+        try {
+            Reserva actualizada = reservaService.actualizarReserva(nroReser, reserva);
+            return ResponseEntity.ok(actualizada);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar reserva: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{nroReser}")
+    public ResponseEntity<?> eliminarReserva(@PathVariable String nroReser) {
+        try {
+            reservaService.eliminarReserva(nroReser);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar reserva: " + e.getMessage());
+        }
+    }
 }

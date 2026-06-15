@@ -34,4 +34,31 @@ public class DestinoController {
     public ResponseEntity<List<Destino>> listarDestinos() {
         return ResponseEntity.ok(destinoRepository.findAll());
     }
+    @GetMapping("/{codDest}")
+    public ResponseEntity<?> obtenerDestino(@PathVariable String codDest) {
+        return destinoRepository.findById(codDest.trim())
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{codDest}")
+    public ResponseEntity<?> actualizarDestino(@PathVariable String codDest, @RequestBody Destino destinoDetails) {
+        return destinoRepository.findById(codDest.trim())
+                .<ResponseEntity<?>>map(existingDestino -> {
+                    existingDestino.setCiuDest(destinoDetails.getCiuDest());
+                    existingDestino.setCostDest(destinoDetails.getCostDest());
+                    return ResponseEntity.ok(destinoRepository.save(existingDestino));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{codDest}")
+    public ResponseEntity<?> eliminarDestino(@PathVariable String codDest) {
+        return destinoRepository.findById(codDest.trim())
+                .<ResponseEntity<?>>map(existingDestino -> {
+                    destinoRepository.delete(existingDestino);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

@@ -34,4 +34,37 @@ public class ClienteController {
     public ResponseEntity<List<Cliente>> listarClientes() {
         return ResponseEntity.ok(clienteRepository.findAll());
     }
+    @GetMapping("/{codCli}")
+    public ResponseEntity<?> obtenerCliente(@PathVariable String codCli) {
+        return clienteRepository.findById(codCli.trim())
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{codCli}")
+    public ResponseEntity<?> actualizarCliente(@PathVariable String codCli, @RequestBody Cliente clienteDetails) {
+        return clienteRepository.findById(codCli.trim())
+                .<ResponseEntity<?>>map(existingCliente -> {
+                    existingCliente.setNomCli(clienteDetails.getNomCli());
+                    existingCliente.setApeCli(clienteDetails.getApeCli());
+                    if (clienteDetails.getEdadCli() != null) {
+                        existingCliente.setEdadCli(clienteDetails.getEdadCli().trim());
+                    }
+                    if (clienteDetails.getSexoCli() != null) {
+                        existingCliente.setSexoCli(clienteDetails.getSexoCli().trim());
+                    }
+                    return ResponseEntity.ok(clienteRepository.save(existingCliente));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{codCli}")
+    public ResponseEntity<?> eliminarCliente(@PathVariable String codCli) {
+        return clienteRepository.findById(codCli.trim())
+                .<ResponseEntity<?>>map(existingCliente -> {
+                    clienteRepository.delete(existingCliente);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

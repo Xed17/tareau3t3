@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,5 +71,53 @@ public class UsuarioController {
                 "username", savedUser.getUsername(),
                 "role", savedUser.getRole()
         ));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<?>> listarUsuarios() {
+        List<?> usuarios = usuarioRepository.findAll().stream().map(u -> Map.of(
+                "username", u.getUsername(),
+                "role", u.getRole()
+        )).toList();
+        return ResponseEntity.ok(usuarios);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<?> obtenerUsuario(@PathVariable String username) {
+        return usuarioRepository.findById(username)
+                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(Map.of(
+                        "username", u.getUsername(),
+                        "role", u.getRole()
+                )))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{username}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable String username, @RequestBody Usuario usuarioDetails) {
+        return usuarioRepository.findById(username)
+                .<ResponseEntity<?>>map(existingUser -> {
+                    if (usuarioDetails.getPassword() != null && !usuarioDetails.getPassword().trim().isEmpty()) {
+                        existingUser.setPassword(passwordEncoder.encode(usuarioDetails.getPassword()));
+                    }
+                    if (usuarioDetails.getRole() != null && !usuarioDetails.getRole().trim().isEmpty()) {
+                        existingUser.setRole(usuarioDetails.getRole().trim());
+                    }
+                    Usuario updatedUser = usuarioRepository.save(existingUser);
+                    return ResponseEntity.ok(Map.of(
+                            "username", updatedUser.getUsername(),
+                            "role", updatedUser.getRole()
+                    ));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{username}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable String username) {
+        return usuarioRepository.findById(username)
+                .<ResponseEntity<?>>map(existingUser -> {
+                    usuarioRepository.delete(existingUser);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }

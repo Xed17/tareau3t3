@@ -7,4 +7,6 @@ public interface ReservaService {
     Reserva crearReserva(Reserva reserva);
     List<Reserva> listarReservas();
     Reserva obtenerReserva(String nroReser);
+    Reserva actualizarReserva(String nroReser, Reserva reserva);
+    void eliminarReserva(String nroReser);
 }

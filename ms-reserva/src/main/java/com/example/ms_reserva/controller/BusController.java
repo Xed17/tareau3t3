@@ -37,4 +37,34 @@ public class BusController {
     public ResponseEntity<List<Bus>> listarBuses() {
         return ResponseEntity.ok(busRepository.findAll());
     }
+    @GetMapping("/{codBus}")
+    public ResponseEntity<?> obtenerBus(@PathVariable String codBus) {
+        return busRepository.findById(codBus.trim())
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{codBus}")
+    public ResponseEntity<?> actualizarBus(@PathVariable String codBus, @RequestBody Bus busDetails) {
+        return busRepository.findById(codBus.trim())
+                .<ResponseEntity<?>>map(existingBus -> {
+                    existingBus.setModBus(busDetails.getModBus());
+                    if (busDetails.getPlacaBus() != null) {
+                        existingBus.setPlacaBus(busDetails.getPlacaBus().trim());
+                    }
+                    existingBus.setCapBus(busDetails.getCapBus());
+                    return ResponseEntity.ok(busRepository.save(existingBus));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{codBus}")
+    public ResponseEntity<?> eliminarBus(@PathVariable String codBus) {
+        return busRepository.findById(codBus.trim())
+                .<ResponseEntity<?>>map(existingBus -> {
+                    busRepository.delete(existingBus);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

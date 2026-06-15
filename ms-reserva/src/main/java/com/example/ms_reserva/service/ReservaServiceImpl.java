@@ -99,4 +99,46 @@ public class ReservaServiceImpl implements ReservaService {
             return String.format("R%07d", count + 1);
         }
     }
+    @Override
+    @Transactional
+    public Reserva actualizarReserva(String nroReser, Reserva reserva) {
+        Reserva existente = obtenerReserva(nroReser);
+
+        if (reserva.getCliente() == null || reserva.getCliente().getCodCli() == null) {
+            throw new IllegalArgumentException("El cliente y su código son obligatorios");
+        }
+        if (reserva.getProgramacion() == null || reserva.getProgramacion().getIdProg() == null) {
+            throw new IllegalArgumentException("La programación y su ID son obligatorios");
+        }
+        if (reserva.getDestino() == null || reserva.getDestino().getCodDest() == null) {
+            throw new IllegalArgumentException("El destino y su código son obligatorios");
+        }
+
+        // Validate Cliente
+        Cliente cliente = clienteRepository.findById(reserva.getCliente().getCodCli().trim())
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con código: " + reserva.getCliente().getCodCli()));
+        existente.setCliente(cliente);
+
+        // Validate Programacion
+        Programacion prog = programacionRepository.findById(reserva.getProgramacion().getIdProg())
+                .orElseThrow(() -> new IllegalArgumentException("Programación no encontrada con ID: " + reserva.getProgramacion().getIdProg()));
+        existente.setProgramacion(prog);
+
+        // Validate Destino
+        Destino dest = destinoRepository.findById(reserva.getDestino().getCodDest().trim())
+                .orElseThrow(() -> new IllegalArgumentException("Destino no encontrado con código: " + reserva.getDestino().getCodDest()));
+        existente.setDestino(dest);
+
+        existente.setFechaReser(reserva.getFechaReser());
+        existente.setHoraReser(reserva.getHoraReser());
+
+        return reservaRepository.save(existente);
+    }
+
+    @Override
+    @Transactional
+    public void eliminarReserva(String nroReser) {
+        Reserva existente = obtenerReserva(nroReser);
+        reservaRepository.delete(existente);
+    }
 }
