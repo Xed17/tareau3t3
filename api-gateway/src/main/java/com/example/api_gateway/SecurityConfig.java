@@ -7,6 +7,8 @@ import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+import org.springframework.http.HttpMethod;
+
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -24,6 +26,7 @@ public class SecurityConfig {
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .pathMatchers("/auth/login").permitAll()
                         .anyExchange().authenticated()
                 )

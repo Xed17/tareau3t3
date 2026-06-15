@@ -52,8 +52,12 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
-        if (usuario.getUsername() == null || usuario.getPassword() == null || usuario.getRole() == null) {
-            return ResponseEntity.badRequest().body("Username, password, and role are required");
+        if (usuario.getUsername() == null || usuario.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Username and password are required");
+        }
+
+        if (usuario.getRole() == null || usuario.getRole().trim().isEmpty()) {
+            usuario.setRole("ROLE_USER");
         }
 
         if (usuarioRepository.existsById(usuario.getUsername())) {

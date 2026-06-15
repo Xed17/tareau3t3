@@ -7,6 +7,35 @@
 	},
 	"item": [
 		{
+			"name": "0. Registrar Usuario (Público con Rol)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin_nuevo\",\n    \"password\": \"seguro_password\",\n    \"role\": \"ROLE_ADMIN\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/usuarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"usuarios"
+					]
+				},
+				"description": "Endpoint público para registrar un nuevo usuario con cualquier rol (ROLE_ADMIN, ROLE_USER, etc.)."
+			},
+			"response": []
+		},
+		{
 			"name": "1. Iniciar Sesión (Obtener JWT Token)",
 			"event": [
 				{
