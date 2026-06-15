@@ -1,6 +1,7 @@
 package com.example.ms_reserva.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -17,12 +18,15 @@ public class Programacion {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "cod_bus", referencedColumnName = "cod_bus", nullable = false)
+    @NotNull(message = "El bus es obligatorio")
     private Bus bus;
 
     @Column(name = "fecha", nullable = false)
+    @NotNull(message = "La fecha de programación es obligatoria")
     private LocalDate fecha;
 
     @Column(name = "hora", nullable = false)
+    @NotNull(message = "La hora de programación es obligatoria")
     private LocalTime hora;
 
     public Programacion() {}

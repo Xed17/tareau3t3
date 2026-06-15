@@ -2,6 +2,8 @@ package com.example.ms_reserva.controller;
 
 import com.example.ms_reserva.model.Bus;
 import com.example.ms_reserva.repository.BusRepository;
+import com.example.ms_reserva.repository.ProgramacionRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +15,15 @@ import java.util.List;
 public class BusController {
 
     private final BusRepository busRepository;
+    private final ProgramacionRepository programacionRepository;
 
-    public BusController(BusRepository busRepository) {
+    public BusController(BusRepository busRepository, ProgramacionRepository programacionRepository) {
         this.busRepository = busRepository;
+        this.programacionRepository = programacionRepository;
     }
 
     @PostMapping
-    public ResponseEntity<?> crearBus(@RequestBody Bus bus) {
+    public ResponseEntity<?> crearBus(@Valid @RequestBody Bus bus) {
         if (bus.getCodBus() == null || bus.getCodBus().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El código del bus es obligatorio");
         }
@@ -45,7 +49,7 @@ public class BusController {
     }
 
     @PutMapping("/{codBus}")
-    public ResponseEntity<?> actualizarBus(@PathVariable String codBus, @RequestBody Bus busDetails) {
+    public ResponseEntity<?> actualizarBus(@PathVariable String codBus, @Valid @RequestBody Bus busDetails) {
         return busRepository.findById(codBus.trim())
                 .<ResponseEntity<?>>map(existingBus -> {
                     existingBus.setModBus(busDetails.getModBus());
@@ -60,8 +64,12 @@ public class BusController {
 
     @DeleteMapping("/{codBus}")
     public ResponseEntity<?> eliminarBus(@PathVariable String codBus) {
-        return busRepository.findById(codBus.trim())
+        String trimmedCod = codBus.trim();
+        return busRepository.findById(trimmedCod)
                 .<ResponseEntity<?>>map(existingBus -> {
+                    if (programacionRepository.existsByBusCodBus(trimmedCod)) {
+                        return ResponseEntity.badRequest().body("No se puede eliminar el bus porque tiene programaciones asociadas");
+                    }
                     busRepository.delete(existingBus);
                     return ResponseEntity.noContent().build();
                 })

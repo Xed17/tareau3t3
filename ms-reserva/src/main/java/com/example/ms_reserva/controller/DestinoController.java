@@ -2,6 +2,8 @@ package com.example.ms_reserva.controller;
 
 import com.example.ms_reserva.model.Destino;
 import com.example.ms_reserva.repository.DestinoRepository;
+import com.example.ms_reserva.repository.ReservaRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +15,15 @@ import java.util.List;
 public class DestinoController {
 
     private final DestinoRepository destinoRepository;
+    private final ReservaRepository reservaRepository;
 
-    public DestinoController(DestinoRepository destinoRepository) {
+    public DestinoController(DestinoRepository destinoRepository, ReservaRepository reservaRepository) {
         this.destinoRepository = destinoRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     @PostMapping
-    public ResponseEntity<?> crearDestino(@RequestBody Destino destino) {
+    public ResponseEntity<?> crearDestino(@Valid @RequestBody Destino destino) {
         if (destino.getCodDest() == null || destino.getCodDest().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El código del destino es obligatorio");
         }
@@ -42,7 +46,7 @@ public class DestinoController {
     }
 
     @PutMapping("/{codDest}")
-    public ResponseEntity<?> actualizarDestino(@PathVariable String codDest, @RequestBody Destino destinoDetails) {
+    public ResponseEntity<?> actualizarDestino(@PathVariable String codDest, @Valid @RequestBody Destino destinoDetails) {
         return destinoRepository.findById(codDest.trim())
                 .<ResponseEntity<?>>map(existingDestino -> {
                     existingDestino.setCiuDest(destinoDetails.getCiuDest());
@@ -54,8 +58,12 @@ public class DestinoController {
 
     @DeleteMapping("/{codDest}")
     public ResponseEntity<?> eliminarDestino(@PathVariable String codDest) {
-        return destinoRepository.findById(codDest.trim())
+        String trimmedCod = codDest.trim();
+        return destinoRepository.findById(trimmedCod)
                 .<ResponseEntity<?>>map(existingDestino -> {
+                    if (reservaRepository.existsByDestinoCodDest(trimmedCod)) {
+                        return ResponseEntity.badRequest().body("No se puede eliminar el destino porque tiene reservas asociadas");
+                    }
                     destinoRepository.delete(existingDestino);
                     return ResponseEntity.noContent().build();
                 })

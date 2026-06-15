@@ -4,6 +4,8 @@ import com.example.ms_reserva.model.Bus;
 import com.example.ms_reserva.model.Programacion;
 import com.example.ms_reserva.repository.BusRepository;
 import com.example.ms_reserva.repository.ProgramacionRepository;
+import com.example.ms_reserva.repository.ReservaRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +18,16 @@ public class ProgramacionController {
 
     private final ProgramacionRepository programacionRepository;
     private final BusRepository busRepository;
+    private final ReservaRepository reservaRepository;
 
-    public ProgramacionController(ProgramacionRepository programacionRepository, BusRepository busRepository) {
+    public ProgramacionController(ProgramacionRepository programacionRepository, BusRepository busRepository, ReservaRepository reservaRepository) {
         this.programacionRepository = programacionRepository;
         this.busRepository = busRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     @PostMapping
-    public ResponseEntity<?> crearProgramacion(@RequestBody Programacion programacion) {
+    public ResponseEntity<?> crearProgramacion(@Valid @RequestBody Programacion programacion) {
         if (programacion.getBus() == null || programacion.getBus().getCodBus() == null) {
             return ResponseEntity.badRequest().body("El bus y su código son obligatorios");
         }
@@ -46,7 +50,7 @@ public class ProgramacionController {
     }
 
     @PutMapping("/{idProg}")
-    public ResponseEntity<?> actualizarProgramacion(@PathVariable Integer idProg, @RequestBody Programacion programacionDetails) {
+    public ResponseEntity<?> actualizarProgramacion(@PathVariable Integer idProg, @Valid @RequestBody Programacion programacionDetails) {
         return programacionRepository.findById(idProg)
                 .<ResponseEntity<?>>map(existingProg -> {
                     if (programacionDetails.getBus() != null && programacionDetails.getBus().getCodBus() != null) {
@@ -72,6 +76,9 @@ public class ProgramacionController {
     public ResponseEntity<?> eliminarProgramacion(@PathVariable Integer idProg) {
         return programacionRepository.findById(idProg)
                 .<ResponseEntity<?>>map(existingProg -> {
+                    if (reservaRepository.existsByProgramacionIdProg(idProg)) {
+                        return ResponseEntity.badRequest().body("No se puede eliminar la programación porque tiene reservas asociadas");
+                    }
                     programacionRepository.delete(existingProg);
                     return ResponseEntity.noContent().build();
                 })

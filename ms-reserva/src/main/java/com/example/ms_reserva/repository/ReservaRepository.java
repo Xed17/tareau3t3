@@ -10,4 +10,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
 
     @Query("SELECT MAX(r.nroReser) FROM Reserva r")
     String findMaxNroReser();
+
+    boolean existsByClienteCodCli(String codCli);
+    boolean existsByDestinoCodDest(String codDest);
+    boolean existsByProgramacionIdProg(Integer idProg);
 }

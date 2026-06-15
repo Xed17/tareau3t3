@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProgramacionRepository extends JpaRepository<Programacion, Integer> {
+    boolean existsByBusCodBus(String codBus);
 }

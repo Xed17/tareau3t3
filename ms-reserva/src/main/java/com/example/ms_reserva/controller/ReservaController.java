@@ -2,6 +2,7 @@ package com.example.ms_reserva.controller;
 
 import com.example.ms_reserva.model.Reserva;
 import com.example.ms_reserva.service.ReservaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class ReservaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crearReserva(@RequestBody Reserva reserva) {
+    public ResponseEntity<?> crearReserva(@Valid @RequestBody Reserva reserva) {
         try {
             Reserva nuevaReserva = reservaService.crearReserva(reserva);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaReserva);
@@ -47,7 +48,7 @@ public class ReservaController {
         }
     }
     @PutMapping("/{nroReser}")
-    public ResponseEntity<?> actualizarReserva(@PathVariable String nroReser, @RequestBody Reserva reserva) {
+    public ResponseEntity<?> actualizarReserva(@PathVariable String nroReser, @Valid @RequestBody Reserva reserva) {
         try {
             Reserva actualizada = reservaService.actualizarReserva(nroReser, reserva);
             return ResponseEntity.ok(actualizada);

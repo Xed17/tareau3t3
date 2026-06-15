@@ -1,6 +1,7 @@
 package com.example.ms_reserva.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,24 +16,30 @@ public class Reserva {
     @Id
     @Column(name = "nro_reser", length = 8)
     @JdbcTypeCode(java.sql.Types.CHAR)
+    @Size(max = 8, message = "El número de reserva no puede superar los 8 caracteres")
     private String nroReser;
 
     @Column(name = "fecha_reser", nullable = false)
+    @NotNull(message = "La fecha de reserva es obligatoria")
     private LocalDate fechaReser;
 
     @Column(name = "hora_reser", nullable = false)
+    @NotNull(message = "La hora de reserva es obligatoria")
     private LocalTime horaReser;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "cod_cli", referencedColumnName = "cod_cli", nullable = false)
+    @NotNull(message = "El cliente es obligatorio")
     private Cliente cliente;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_prog", referencedColumnName = "id_prog", nullable = false)
+    @NotNull(message = "La programación es obligatoria")
     private Programacion programacion;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "cod_dest", referencedColumnName = "cod_dest", nullable = false)
+    @NotNull(message = "El destino es obligatorio")
     private Destino destino;
 
     public Reserva() {}

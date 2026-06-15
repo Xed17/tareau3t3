@@ -8,7 +8,7 @@ spring:
         - id: ms-reserva-routes
           uri: lb://ms-reserva
           predicates:
-            - Path=/reservas/**, /buses/**, /clientes/**, /destinos/**, /programaciones/**, /usuarios/**
+            - Path=/reservas/**, /buses/**, /clientes/**, /destinos/**, /programaciones/**, /usuarios/**, /auth/**
 
 eureka:
   client:

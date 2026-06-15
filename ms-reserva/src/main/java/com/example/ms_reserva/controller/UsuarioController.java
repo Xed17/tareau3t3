@@ -2,6 +2,7 @@ package com.example.ms_reserva.controller;
 
 import com.example.ms_reserva.model.Usuario;
 import com.example.ms_reserva.repository.UsuarioRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,36 +24,10 @@ public class UsuarioController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("/auth")
-    public ResponseEntity<?> authenticate(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("username");
-        String password = credentials.get("password");
 
-        if (username == null || password == null) {
-            return ResponseEntity.badRequest().body(Map.of("authenticated", false, "message", "Username and password are required"));
-        }
-
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(username);
-        if (usuarioOpt.isEmpty()) {
-            return ResponseEntity.ok(Map.of("authenticated", false, "message", "User not found"));
-        }
-
-        Usuario usuario = usuarioOpt.get();
-        boolean matches = passwordEncoder.matches(password, usuario.getPassword());
-
-        if (matches) {
-            return ResponseEntity.ok(Map.of(
-                    "authenticated", true,
-                    "username", usuario.getUsername(),
-                    "role", usuario.getRole()
-            ));
-        } else {
-            return ResponseEntity.ok(Map.of("authenticated", false, "message", "Invalid password"));
-        }
-    }
 
     @PostMapping
-    public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> crearUsuario(@Valid @RequestBody Usuario usuario) {
         if (usuario.getUsername() == null || usuario.getPassword() == null) {
             return ResponseEntity.badRequest().body("Username and password are required");
         }
